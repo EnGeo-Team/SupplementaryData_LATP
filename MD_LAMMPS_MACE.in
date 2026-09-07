@@ -1,0 +1,46 @@
+# LAMMPS-MACE MD template
+units         metal
+boundary      p p p
+atom_style    atomic
+atom_modify   map yes
+newton        on
+
+read_data LATP_221supercell-pmg_no-opt_16sub_A_Li_added.dat
+
+mass 1 6.94	 # Li
+mass 2 26.9815385	 # Al
+mass 3 47.867	 # Ti
+mass 4 30.973761998	 # P
+mass 5 15.999	 # O
+
+# add the no_domain decomposition option to the pair_style declaration
+pair_style mace no_domain_decomposition
+pair_coeff * * $location/MACE_finetuned_LATP_grid_and_MD.model Li Al Ti P O 
+
+labelmap atom 1 Li 2 Al 3 Ti 4 P 5 O 
+
+neigh_modify	delay 1
+
+thermo          100
+timestep	0.002
+
+# NVT equil for 20 ps
+fix             1 all nvt temp 1000.0 1000.0 0.05 
+fix             2 all recenter INIT INIT INIT
+
+run		10000
+
+write_data	Li1.3Al0.3Ti1.7(PO4)3_equil.dat
+
+reset_timestep	0
+
+# NVT production for 100 ps
+dump myDump all xyz 50 MACE_MD_traj_Li1.3Al0.3Ti1.7(PO4)3.xyz
+dump_modify myDump element Li Al Ti P O  first yes sort 1
+
+run		250000
+
+unfix		1
+
+write_data	Li1.3Al0.3Ti1.7(PO4)3_prod.dat
+

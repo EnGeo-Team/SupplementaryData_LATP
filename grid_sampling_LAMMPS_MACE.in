@@ -1,0 +1,22 @@
+# LAMMPS-MACE template
+units         metal
+boundary      p p p
+atom_style    atomic
+atom_modify   map yes
+newton        on
+
+read_data DATAFILE
+
+ADDMASSES
+
+# add the no_domain decomposition option to the pair_style declaration
+pair_style mace no_domain_decomposition
+pair_coeff * * $location/MACE_finetuned_LATP_grid.model Li Al Ti P O 
+
+labelmap atom 1 Li 2 Al 3 Ti 4 P 5 O 
+
+thermo 1
+
+thermo_modify format 5 %10.10g
+
+rerun GRID_TRAJFILE.xyz dump x y z box no format xyz
