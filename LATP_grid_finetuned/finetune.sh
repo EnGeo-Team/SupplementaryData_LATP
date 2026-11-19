@@ -15,7 +15,7 @@ mace_run_train \
     --lr=0.001 \
     --scaling="rms_forces_scaling" \
     --batch_size=1 \
-    --max_num_epochs=20 \
+    --max_num_epochs=10 \
     --ema \
     --ema_decay=0.99 \
     --amsgrad \
