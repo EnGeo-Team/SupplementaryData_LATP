@@ -17,7 +17,11 @@ The repository contains the following files and folders:
 
 
 Software versions used:
+
 RASPA version: 2.0.50
+
 MACE version: 0.3.16
+
 LAMMPS (10 Sep 2025) with Kokkos version 4.6.2 enabled
+
 CP2K version: 2026.2
