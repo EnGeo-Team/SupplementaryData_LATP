@@ -1,0 +1,24 @@
+# LAMMPS-MACE MD template
+units         metal
+boundary      p p p
+atom_style    atomic
+atom_modify   map yes
+newton        on
+
+read_data LATP_input_file.dat
+
+# add the no_domain decomposition option to the pair_style declaration
+pair_style mace no_domain_decomposition
+pair_coeff * * $model_location/MACE.model-lammps.pt Li Ti Al P O 
+
+neigh_modify	delay 1
+
+thermo          100
+timestep	0.002
+
+fix 		1 all box/relax iso 0.0 vmax 0.001 fixedpoint 0 0 0
+
+minimize 	0.0 1.0e-8 10000 100000
+
+write_data	LATP_geoOpt.dat
+

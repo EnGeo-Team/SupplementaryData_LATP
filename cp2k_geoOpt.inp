@@ -1,0 +1,122 @@
+&GLOBAL
+  ! the project name is made part of most output files... useful to keep order
+  PROJECT LATP_Geo_Opt
+  ! various runtypes (energy, geo_opt, etc.) available.
+  RUN_TYPE CELL_OPT             
+  ! reduce the amount of IO
+  IOLEVEL  LOW 
+&END GLOBAL
+
+&FORCE_EVAL
+  METHOD QS
+  STRESS_TENSOR ANALYTICAL
+  &DFT
+    BASIS_SET_FILE_NAME BASIS_MOLOPT
+    POTENTIAL_FILE_NAME POTENTIAL
+    &MGRID
+      CUTOFF     400
+      REL_CUTOFF 50
+      NGRIDS     4
+    &END MGRID
+    &POISSON
+      PERIODIC XYZ
+    &END POISSON
+    &QS
+      METHOD GPW
+    &END QS
+    &SCF
+      SCF_GUESS RESTART
+      EPS_SCF 1.0E-6
+      MAX_SCF 3000
+      IGNORE_CONVERGENCE_FAILURE
+      &OT
+        MINIMIZER      CG
+        PRECONDITIONER FULL_ALL
+	ENERGY_GAP 1.0E-3
+      &END OT
+    &END SCF
+    &XC
+      &XC_FUNCTIONAL 
+	&PBE
+	  PARAMETRIZATION ORIG
+	&END PBE
+      &END XC_FUNCTIONAL
+      &VDW_POTENTIAL
+        DISPERSION_FUNCTIONAL  PAIR_POTENTIAL
+        &PAIR_POTENTIAL
+          TYPE                 DFTD3
+          PARAMETER_FILE_NAME  dftd3.dat
+          REFERENCE_FUNCTIONAL PBE
+        &END PAIR_POTENTIAL
+      &END
+    &END XC
+  &END DFT
+  &SUBSYS
+    &CELL
+      CELL_FILE_FORMAT CIF
+      CELL_FILE_NAME LATP_input_file.cif
+      ! SYMMETRY cubic
+    &END CELL
+    &TOPOLOGY
+      COORD_FILE_FORMAT CIF
+      COORD_FILE_NAME LATP_input_file.cif
+    &END TOPOLOGY
+    &KIND Al
+      BASIS_SET DZVP-MOLOPT-SR-GTH
+      POTENTIAL GTH-PBE
+    &END KIND
+    &KIND Ti
+      BASIS_SET DZVP-MOLOPT-SR-GTH
+      POTENTIAL GTH-PBE
+    &END KIND
+    &KIND Li
+      BASIS_SET DZVP-MOLOPT-SR-GTH
+      POTENTIAL GTH-PBE
+    &END KIND
+     &KIND P
+      BASIS_SET DZVP-MOLOPT-SR-GTH
+      POTENTIAL GTH-PBE
+    &END KIND 
+    &KIND O
+      BASIS_SET DZVP-MOLOPT-SR-GTH
+      POTENTIAL GTH-PBE
+    &END KIND
+  &END SUBSYS
+&END FORCE_EVAL
+
+&MOTION
+
+  &CELL_OPT
+    KEEP_ANGLES TRUE
+  &END
+
+  &GEO_OPT
+    OPTIMIZER BFGS
+  &END
+ 
+  &PRINT
+    &TRAJECTORY                        ! Controls the output of the trajectory
+      FORMAT XYZ                       ! Format of the output trajectory:  XYZ
+      &EACH                            ! New trajectory frame will be printed each step
+          CELL_OPT 1
+      &END EACH
+    &END TRAJECTORY
+    &FORCES ON
+      FILENAME forces
+      FORMAT XYZ
+      &EACH
+       CELL_OPT 1
+      &END EACH
+    &END FORCES
+    &RESTART                           ! This section controls the printing of restart files
+      &EACH                            ! A restart file will be printed every step
+        CELL_OPT 1
+      &END EACH
+    &END RESTART
+    &RESTART_HISTORY                   ! This section controls dumping of unique restart files during the run keeping all of them. Most useful if recovery is needed at a later point.
+      &EACH                            ! A new restart file will be printed every step
+        CELL_OPT 1
+      &END EACH
+    &END RESTART_HISTORY
+  &END PRINT
+&END
